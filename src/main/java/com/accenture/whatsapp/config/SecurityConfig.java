@@ -132,15 +132,23 @@ public class SecurityConfig {
  * CORS CONFIGURATION
  * Purpose: Allow Angular frontend to make requests to this API
  */
+/**
+ * CORS CONFIGURATION
+ * Purpose: Allow Angular frontend to make requests to this API
+ */
 @Bean
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     
-    // Allow requests from Angular development server
+    // Allow requests from multiple origins
     configuration.setAllowedOrigins(Arrays.asList(
-        "http://localhost:4200",    // Angular default port
-        "http://localhost:3000",    // Alternative port
-        "http://127.0.0.1:4200"
+        "http://localhost:4200",              // Local development
+        "http://localhost:3000",              // Alternative local
+        "http://127.0.0.1:4200",
+        "https://*.vercel.app",               // Vercel deployments
+        "https://*.netlify.app",              // Netlify deployments
+        "https://whatsappclone.vercel.app",   // Your production domain (update this)
+        "https://your-custom-domain.com"      // Your custom domain (if you buy one)
     ));
     
     // Allow all HTTP methods
