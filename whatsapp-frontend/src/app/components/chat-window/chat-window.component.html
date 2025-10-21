@@ -1,0 +1,32 @@
+<!-- Message Input -->
+<div class="message-input-container">
+  <textarea 
+    [(ngModel)]="newMessage"
+    (keypress)="onKeyPress($event)"
+    placeholder="Type a message..."
+    class="message-input"
+    rows="1"
+    [disabled]="sending || isRecording"></textarea>
+
+  <!-- 🎤 Voice Recording Button -->
+  <button 
+    class="btn-voice"
+    (mousedown)="recordAudio()" 
+    (mouseup)="stopRecording()"
+    (mouseleave)="stopRecording()"
+    [class.recording]="isRecording">
+    🎤
+  </button>
+
+  <!-- ✉️ Send Text Button -->
+  <button 
+    (click)="sendMessage()"
+    class="btn-send"
+    [disabled]="!newMessage.trim() || sending">
+    <svg *ngIf="!sending" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="22" y1="2" x2="11" y2="13"></line>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+    </svg>
+    <span *ngIf="sending">...</span>
+  </button>
+</div>

@@ -1,0 +1,67 @@
+<div class="sidebar">
+  <!-- Header -->
+  <div class="sidebar-header">
+    <div class="user-info">
+      <div class="avatar">
+        {{ getInitials(currentUser?.fullName || 'U') }}
+      </div>
+      <div class="user-details">
+        <h3>{{ currentUser?.fullName }}</h3>
+        <p>@{{ currentUser?.username }}</p>
+      </div>
+    </div>
+    <button class="btn-logout" (click)="logout()" title="Logout">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-box">
+    <input 
+      type="text" 
+      [(ngModel)]="searchKeyword"
+      (input)="searchUsers()"
+      placeholder="Search users..."
+      class="search-input">
+  </div>
+
+  <!-- User List -->
+  <div class="user-list">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <p>Loading users...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && users.length === 0" class="empty-state">
+      <p>No users found</p>
+    </div>
+
+    <!-- Users -->
+    <div 
+      *ngFor="let user of users" 
+      class="user-item"
+      [class.active]="selectedUserId === user.id"
+      (click)="selectUser(user)">
+      
+      <div class="user-avatar">
+        {{ getInitials(user.fullName) }}
+        <span class="online-indicator" [class.online]="user.online"></span>
+      </div>
+
+      <div class="user-info-item">
+        <div class="user-name">{{ user.fullName }}</div>
+        <div class="user-username">@{{ user.username }}</div>
+      </div>
+
+      <div class="user-status">
+        <span *ngIf="user.online" class="status-text online">Online</span>
+        <span *ngIf="!user.online" class="status-text offline">Offline</span>
+      </div>
+    </div>
+  </div>
+</div>
