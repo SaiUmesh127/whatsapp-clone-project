@@ -141,31 +141,21 @@ public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     
     // Allow requests from multiple origins
-    configuration.setAllowedOrigins(Arrays.asList(
-        "http://localhost:4200",              // Local development
-        "http://localhost:3000",              // Alternative local
-        "http://127.0.0.1:4200",
-        "https://*.vercel.app",               // Vercel deployments
-        "https://*.netlify.app",              // Netlify deployments
-        "https://whatsappclone.vercel.app",   // Your production domain (update this)
-        "https://your-custom-domain.com"      // Your custom domain (if you buy one)
+    configuration.setAllowedOriginPatterns(Arrays.asList(
+        "http://localhost:*",
+        "https://*.vercel.app",
+        "https://*.netlify.app",
+        "https://*.onrender.com",
+        "https://*.render.com"
     ));
     
-    // Allow all HTTP methods
     configuration.setAllowedMethods(Arrays.asList(
         "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
     ));
     
-    // Allow all headers
     configuration.setAllowedHeaders(Arrays.asList("*"));
-    
-    // Allow credentials (cookies, authorization headers)
     configuration.setAllowCredentials(true);
-    
-    // Expose Authorization header to frontend
     configuration.setExposedHeaders(Arrays.asList("Authorization"));
-    
-    // Cache preflight requests for 1 hour
     configuration.setMaxAge(3600L);
     
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
