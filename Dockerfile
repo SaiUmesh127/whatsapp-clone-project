@@ -9,8 +9,8 @@ RUN npm run build --prod
 # Stage 2: Build Spring Boot backend
 FROM maven:3.9.3-eclipse-temurin-17 AS backend-build
 WORKDIR /app
-COPY whatsapp-backend/pom.xml .
-COPY whatsapp-backend/src ./src
+COPY pom.xml .
+COPY src ./src
 # Copy built Angular files into backend static folder
 COPY --from=frontend-build /app/dist ./src/main/resources/static
 RUN mvn clean package -DskipTests
