@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar target/whatsapp-clone-1.0.0.jar
+java -Dspring.profiles.active=render -Dserver.port=8080 -jar target/whatsapp-clone-1.0.0.jar
