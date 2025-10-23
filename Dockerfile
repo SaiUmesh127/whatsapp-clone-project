@@ -1,22 +1,24 @@
-# Use official OpenJDK image name changed
+# Use official OpenJDK image
 FROM openjdk:17-jdk-slim
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy Maven project files
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
+# Copy pom.xml and source code
 COPY pom.xml .
 COPY src ./src
 
-# Package the Spring Boot app
-RUN apt-get update && apt-get install -y maven
+# Build the project inside Docker
 RUN mvn clean package -DskipTests
 
-# Copy the jar file
+# Copy the generated JAR from target folder
+RUN ls target/   # Optional: to verify file name
 COPY target/whatsapp-clone-1.0.0.jar app.jar
 
-# Expose default Render port
+# Expose port
 EXPOSE 10000
 
-# Start command using Render's $PORT
+# Start the app
 CMD ["sh", "-c", "java -Dspring.profiles.active=render -Dserver.port=$PORT -jar app.jar"]
