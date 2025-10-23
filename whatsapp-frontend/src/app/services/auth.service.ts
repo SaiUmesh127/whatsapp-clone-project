@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth-response.model';
+import { environment } from '../../environments/environment'; // ✅ Import environment
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = `${environment.apiUrl}/api/auth`; // ✅ Uses dynamic base URL
   
   private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -24,27 +25,21 @@ export class AuthService {
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request)
       .pipe(
-        tap(response => {
-          this.saveUserData(response);
-        })
+        tap(response => this.saveUserData(response))
       );
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request)
       .pipe(
-        tap(response => {
-          this.saveUserData(response);
-        })
+        tap(response => this.saveUserData(response))
       );
   }
 
   logout(): Observable<any> {
     return this.http.post(`${this.apiUrl}/logout`, {})
       .pipe(
-        tap(() => {
-          this.clearUserData();
-        })
+        tap(() => this.clearUserData())
       );
   }
 

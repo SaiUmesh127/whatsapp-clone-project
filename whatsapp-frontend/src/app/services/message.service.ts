@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Message, Conversation } from '../models/message.model';
+import { environment } from '../../environments/environment'; // ✅ Import environment
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
   
-  private apiUrl = 'http://localhost:8080/api/messages';
+  private apiUrl = `${environment.apiUrl}/api/messages`; // ✅ Uses environment base URL
 
   constructor(private http: HttpClient) { }
 
@@ -31,7 +32,8 @@ export class MessageService {
   getUnreadCount(): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/unread-count`);
   }
-  uploadVoiceMessage(formData: FormData) {
-  return this.http.post<Message>(`${this.apiUrl}/messages/audio`, formData);
-}
+
+  uploadVoiceMessage(formData: FormData): Observable<Message> {
+    return this.http.post<Message>(`${this.apiUrl}/audio`, formData);
+  }
 }

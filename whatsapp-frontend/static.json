@@ -1,0 +1,6 @@
+{
+  "root": "dist/whatsapp-frontend",
+  "routes": {
+    "/**": "index.html"
+  }
+}
