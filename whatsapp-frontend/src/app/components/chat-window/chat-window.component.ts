@@ -10,7 +10,6 @@ import { Message } from '../../models/message.model';
   styleUrls: ['./chat-window.component.css']
 })
 export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked {
-
   @Input() selectedUser: User | null = null;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
@@ -29,7 +28,7 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
   constructor(
     private messageService: MessageService,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
@@ -55,8 +54,8 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
     if (!this.selectedUser) return;
 
     this.loading = true;
-    this.messageService.getConversation(this.selectedUser.id).subscribe({
-      next: (messages) => {
+    this.messageService.getConversation(this.selectedUser.id.toString()).subscribe({
+      next: (messages: Message[]) => {
         this.messages = messages;
         this.loading = false;
         this.shouldScroll = true;
@@ -69,9 +68,7 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
   }
 
   sendMessage(): void {
-    if (!this.newMessage.trim() || !this.selectedUser || this.sending) {
-      return;
-    }
+    if (!this.newMessage.trim() || !this.selectedUser || this.sending) return;
 
     const message: Message = {
       receiverId: this.selectedUser.id,
@@ -82,7 +79,6 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
     };
 
     this.sending = true;
-
     this.messageService.sendMessage(message).subscribe({
       next: (sentMessage) => {
         this.messages.push(sentMessage);
@@ -111,9 +107,9 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
 
   scrollToBottom(): void {
     try {
-      this.messagesContainer.nativeElement.scrollTop = 
+      this.messagesContainer.nativeElement.scrollTop =
         this.messagesContainer.nativeElement.scrollHeight;
-    } catch(err) {
+    } catch (err) {
       console.error('Scroll error:', err);
     }
   }
@@ -121,7 +117,9 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
   getInitials(fullName: string): string {
     const names = fullName.split(' ');
     if (names.length >= 2) {
-      return names[0].charAt(0).toUpperCase() + names[1].charAt(0).toUpperCase();
+      return (
+        names[0].charAt(0).toUpperCase() + names[1].charAt(0).toUpperCase()
+      );
     }
     return fullName.charAt(0).toUpperCase();
   }
@@ -131,19 +129,14 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
     if (this.isRecording) return;
 
     navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
+      .then((stream) => {
         this.mediaRecorder = new MediaRecorder(stream);
         this.audioChunks = [];
 
-        this.mediaRecorder.ondataavailable = (event: any) => {
-          this.audioChunks.push(event.data);
-        };
+        this.mediaRecorder.ondataavailable = (e: any) => this.audioChunks.push(e.data);
 
         this.mediaRecorder.onstop = () => {
           const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          console.log('🎧 Recorded Audio URL:', audioUrl);
-          // TODO: send to backend
           this.uploadAudio(audioBlob);
         };
 
@@ -151,12 +144,11 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
         this.isRecording = true;
         console.log('🎤 Recording started...');
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Microphone error:', err);
       });
   }
 
-  // 🛑 Stop voice recording
   stopRecording(): void {
     if (this.mediaRecorder && this.isRecording) {
       this.mediaRecorder.stop();
@@ -165,7 +157,6 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
     }
   }
 
-  // 📤 Upload audio file to backend (optional)
   uploadAudio(audioBlob: Blob): void {
     if (!this.selectedUser) return;
 
@@ -175,13 +166,11 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
     formData.append('senderId', this.currentUserId.toString());
 
     this.messageService.uploadVoiceMessage(formData).subscribe({
-      next: (message) => {
+      next: (message: Message) => {
         this.messages.push(message);
         this.shouldScroll = true;
       },
-      error: (error) => {
-        console.error('Error uploading audio:', error);
-      }
+      error: (err: any) => console.error('Error uploading voice message:', err)
     });
   }
 }

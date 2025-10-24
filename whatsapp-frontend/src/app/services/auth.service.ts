@@ -1,19 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { AuthResponse, LoginRequest, RegisterRequest } from '../models/auth-response.model';
-import { environment } from '../../environments/environment'; // ✅ Import environment
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  
-  private apiUrl = `${environment.apiUrl}/api/auth`; // ✅ Uses dynamic base URL
-  
-  private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private baseUrl = 'https://whatsapp-clone-project-pa56.onrender.com/api/auth';
+  private currentUserSubject = new BehaviorSubject<any>(null);
 
   constructor(private http: HttpClient) {
     const storedUser = localStorage.getItem('currentUser');
@@ -22,49 +16,38 @@ export class AuthService {
     }
   }
 
-  register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request)
-      .pipe(
-        tap(response => this.saveUserData(response))
-      );
+  /** Register user */
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/register`, userData);
   }
 
-  login(request: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request)
-      .pipe(
-        tap(response => this.saveUserData(response))
-      );
+  /** Login user */
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/login`, credentials).pipe(
+      tap((user: any) => {
+        if (user) {
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          this.currentUserSubject.next(user);
+        }
+      })
+    );
   }
 
-  logout(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/logout`, {})
-      .pipe(
-        tap(() => this.clearUserData())
-      );
-  }
-
-  getCurrentUser(): AuthResponse | null {
-    return this.currentUserSubject.value;
-  }
-
-  getToken(): string | null {
-    const user = this.getCurrentUser();
-    return user ? user.token : null;
-  }
-
+  /** Check if user is logged in */
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.currentUserSubject.value;
   }
+  getCurrentUser(): any {
+  const user = localStorage.getItem('currentUser');
+  return user ? JSON.parse(user) : null;
+}
 
-  private saveUserData(response: AuthResponse): void {
-    localStorage.setItem('currentUser', JSON.stringify(response));
-    localStorage.setItem('token', response.token);
-    this.currentUserSubject.next(response);
-  }
+logout(): void {
+  localStorage.removeItem('token');
+  localStorage.removeItem('currentUser');
+}
 
-  private clearUserData(): void {
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('token');
-    this.currentUserSubject.next(null);
-  }
+getToken(): string | null {
+  return localStorage.getItem('token');
+}
 }

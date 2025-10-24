@@ -1,39 +1,31 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Message, Conversation } from '../models/message.model';
-import { environment } from '../../environments/environment'; // ✅ Import environment
+import { environment } from 'src/environments/environment';
+import { Message } from '../models/message.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
-  
-  private apiUrl = `${environment.apiUrl}/api/messages`; // ✅ Uses environment base URL
+  private apiUrl = environment.apiUrl; // e.g. https://whatsapp-clone-project-pa56.onrender.com
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
+
+  getConversation(receiverId: string): Observable<Message[]> {
+    return this.http.get<Message[]>(`${this.apiUrl}/api/messages/${receiverId}`);
+  }
 
   sendMessage(message: Message): Observable<Message> {
-    return this.http.post<Message>(this.apiUrl, message);
+    return this.http.post<Message>(`${this.apiUrl}/api/messages/send`, message);
   }
 
-  getConversation(userId: number): Observable<Message[]> {
-    return this.http.get<Message[]>(`${this.apiUrl}/conversation/${userId}`);
+  getAllUsers(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/users`);
   }
 
-  getRecentConversations(): Observable<Conversation[]> {
-    return this.http.get<Conversation[]>(`${this.apiUrl}/recent`);
-  }
-
-  markAsRead(messageId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${messageId}/read`, {});
-  }
-
-  getUnreadCount(): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/unread-count`);
-  }
-
+  // 🎙️ Upload voice message API
   uploadVoiceMessage(formData: FormData): Observable<Message> {
-    return this.http.post<Message>(`${this.apiUrl}/audio`, formData);
+    return this.http.post<Message>(`${this.apiUrl}/api/messages/voice`, formData);
   }
 }
