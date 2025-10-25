@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
-import { MessageService } from 'src/app/services/message.service';
+import { AuthService } from '../../services/auth.service';
+import { MessageService } from '../../services/message.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -30,18 +30,14 @@ export class SidebarComponent implements OnInit {
 
   loadCurrentUser(): void {
     const user = this.authService.getCurrentUser();
-    if (user) {
-      this.currentUser = user;
-    }
+    if (user) this.currentUser = user;
   }
 
   loadAllUsers(): void {
     this.loading = true;
     this.messageService.getAllUsers().subscribe({
       next: (response: any) => {
-        this.users = response.filter(
-          (u: any) => u.id !== this.currentUser?.userId
-        );
+        this.users = response.filter((u: any) => u.id !== this.currentUser?.userId);
         this.loading = false;
       },
       error: (err) => {
@@ -66,20 +62,13 @@ export class SidebarComponent implements OnInit {
       this.loadAllUsers();
       return;
     }
-
     const keyword = this.searchKeyword.toLowerCase();
-    this.users = this.users.filter((u) =>
-      u.fullName.toLowerCase().includes(keyword)
-    );
+    this.users = this.users.filter((u) => u.fullName.toLowerCase().includes(keyword));
   }
 
   getInitials(fullName: string): string {
     const names = fullName.split(' ');
-    if (names.length >= 2) {
-      return (
-        names[0].charAt(0).toUpperCase() + names[1].charAt(0).toUpperCase()
-      );
-    }
-    return fullName.charAt(0).toUpperCase();
+    if (names.length >= 2) return names[0][0].toUpperCase() + names[1][0].toUpperCase();
+    return fullName[0].toUpperCase();
   }
 }

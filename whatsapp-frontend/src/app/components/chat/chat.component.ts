@@ -7,13 +7,11 @@ import { User } from '../../models/user.model';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-
   selectedUser: User | null = null;
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   onUserSelected(user: User): void {
     this.selectedUser = user;

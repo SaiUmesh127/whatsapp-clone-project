@@ -9,24 +9,14 @@ import { LoginRequest } from '../../models/auth-response.model';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-
-  loginData: LoginRequest = {
-    username: '',
-    password: ''
-  };
-
+  loginData: LoginRequest = { username: '', password: '' };
   errorMessage: string = '';
   loading: boolean = false;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/chat']);
-    }
+    if (this.authService.isLoggedIn()) this.router.navigate(['/chat']);
   }
 
   onSubmit(): void {
@@ -35,11 +25,9 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(this.loginData).subscribe({
       next: (response) => {
-        console.log('Login successful:', response);
         this.router.navigate(['/chat']);
       },
       error: (error) => {
-        console.error('Login failed:', error);
         this.errorMessage = error.error?.error || 'Invalid username or password';
         this.loading = false;
       }

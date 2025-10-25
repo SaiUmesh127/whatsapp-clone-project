@@ -20,7 +20,7 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
   sending: boolean = false;
   shouldScroll: boolean = false;
 
-  // 🎙️ Voice recording properties
+  // 🎙️ Voice recording
   mediaRecorder: any;
   audioChunks: any[] = [];
   isRecording: boolean = false;
@@ -32,15 +32,11 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
 
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      this.currentUserId = currentUser.userId;
-    }
+    if (currentUser) this.currentUserId = currentUser.userId;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedUser'] && this.selectedUser) {
-      this.loadMessages();
-    }
+    if (changes['selectedUser'] && this.selectedUser) this.loadMessages();
   }
 
   ngAfterViewChecked(): void {
@@ -52,8 +48,8 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
 
   loadMessages(): void {
     if (!this.selectedUser) return;
-
     this.loading = true;
+
     this.messageService.getConversation(this.selectedUser.id.toString()).subscribe({
       next: (messages: Message[]) => {
         this.messages = messages;
@@ -107,8 +103,7 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
 
   scrollToBottom(): void {
     try {
-      this.messagesContainer.nativeElement.scrollTop =
-        this.messagesContainer.nativeElement.scrollHeight;
+      this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
     } catch (err) {
       console.error('Scroll error:', err);
     }
@@ -116,15 +111,11 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
 
   getInitials(fullName: string): string {
     const names = fullName.split(' ');
-    if (names.length >= 2) {
-      return (
-        names[0].charAt(0).toUpperCase() + names[1].charAt(0).toUpperCase()
-      );
-    }
-    return fullName.charAt(0).toUpperCase();
+    if (names.length >= 2) return names[0][0].toUpperCase() + names[1][0].toUpperCase();
+    return fullName[0].toUpperCase();
   }
 
-  // 🎙️ Start voice recording
+  // Voice recording
   recordAudio(): void {
     if (this.isRecording) return;
 
@@ -132,21 +123,16 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
       .then((stream) => {
         this.mediaRecorder = new MediaRecorder(stream);
         this.audioChunks = [];
-
         this.mediaRecorder.ondataavailable = (e: any) => this.audioChunks.push(e.data);
-
         this.mediaRecorder.onstop = () => {
           const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
           this.uploadAudio(audioBlob);
         };
-
         this.mediaRecorder.start();
         this.isRecording = true;
         console.log('🎤 Recording started...');
       })
-      .catch((err) => {
-        console.error('Microphone error:', err);
-      });
+      .catch((err) => console.error('Microphone error:', err));
   }
 
   stopRecording(): void {
@@ -170,7 +156,7 @@ export class ChatWindowComponent implements OnInit, OnChanges, AfterViewChecked 
         this.messages.push(message);
         this.shouldScroll = true;
       },
-      error: (err: any) => console.error('Error uploading voice message:', err)
+      error: (err) => console.error('Error uploading voice message:', err)
     });
   }
 }

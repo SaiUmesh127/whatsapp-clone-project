@@ -9,36 +9,22 @@ import { RegisterRequest } from '../../models/auth-response.model';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-
-  registerData: RegisterRequest = {
-    username: '',
-    email: '',
-    password: '',
-    fullName: '',
-    phoneNumber: ''
-  };
-
+  registerData: RegisterRequest = { username: '', email: '', password: '', fullName: '', phoneNumber: '' };
   confirmPassword: string = '';
   errorMessage: string = '';
   successMessage: string = '';
   loading: boolean = false;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/chat']);
-    }
+    if (this.authService.isLoggedIn()) this.router.navigate(['/chat']);
   }
 
   onSubmit(): void {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Validation
     if (this.registerData.password !== this.confirmPassword) {
       this.errorMessage = 'Passwords do not match';
       return;
@@ -53,14 +39,10 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register(this.registerData).subscribe({
       next: (response) => {
-        console.log('Registration successful:', response);
         this.successMessage = 'Registration successful! Redirecting to chat...';
-        setTimeout(() => {
-          this.router.navigate(['/chat']);
-        }, 1500);
+        setTimeout(() => this.router.navigate(['/chat']), 1500);
       },
       error: (error) => {
-        console.error('Registration failed:', error);
         this.errorMessage = error.error?.error || 'Registration failed. Please try again.';
         this.loading = false;
       }
