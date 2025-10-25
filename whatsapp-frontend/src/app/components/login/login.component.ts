@@ -1,40 +1,41 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { LoginRequest } from '../../models/auth-response.model';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
-  loginData: LoginRequest = { username: '', password: '' };
-  errorMessage: string = '';
-  loading: boolean = false;
+export class LoginComponent {
+  loginForm: FormGroup;
+  errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
-
-  ngOnInit(): void {
-    if (this.authService.isLoggedIn()) this.router.navigate(['/chat']);
-  }
-
-  onSubmit(): void {
-    this.loading = true;
-    this.errorMessage = '';
-
-    this.authService.login(this.loginData).subscribe({
-      next: (response) => {
-        this.router.navigate(['/chat']);
-      },
-      error: (error) => {
-        this.errorMessage = error.error?.error || 'Invalid username or password';
-        this.loading = false;
-      }
+  constructor(private fb: FormBuilder, private authService: AuthService) {
+    this.loginForm = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     });
   }
 
-  goToRegister(): void {
-    this.router.navigate(['/register']);
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Please fill all required fields.';
+      return;
+    }
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res) => {
+        console.log('Login successful:', res);
+        const body: any = res.body;
+localStorage.setItem('token', body.token);
+
+        alert('Login successful!');
+      },
+      error: (err) => {
+        console.error('Login failed:', err);
+        this.errorMessage = err.error?.message || 'Invalid username or password.';
+      }
+    });
   }
 }

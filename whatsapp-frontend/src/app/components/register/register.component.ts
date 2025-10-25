@@ -1,55 +1,41 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { RegisterRequest } from '../../models/auth-response.model';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent implements OnInit {
-  registerData: RegisterRequest = { username: '', email: '', password: '', fullName: '', phoneNumber: '' };
-  confirmPassword: string = '';
-  errorMessage: string = '';
-  successMessage: string = '';
-  loading: boolean = false;
+export class RegisterComponent {
+  registerForm: FormGroup;
+  errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
-
-  ngOnInit(): void {
-    if (this.authService.isLoggedIn()) this.router.navigate(['/chat']);
-  }
-
-  onSubmit(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    if (this.registerData.password !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match';
-      return;
-    }
-
-    if (this.registerData.password.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters';
-      return;
-    }
-
-    this.loading = true;
-
-    this.authService.register(this.registerData).subscribe({
-      next: (response) => {
-        this.successMessage = 'Registration successful! Redirecting to chat...';
-        setTimeout(() => this.router.navigate(['/chat']), 1500);
-      },
-      error: (error) => {
-        this.errorMessage = error.error?.error || 'Registration failed. Please try again.';
-        this.loading = false;
-      }
+  constructor(private fb: FormBuilder, private authService: AuthService) {
+    this.registerForm = this.fb.group({
+      username: ['', Validators.required],
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      phoneNumber: ['']
     });
   }
 
-  goToLogin(): void {
-    this.router.navigate(['/login']);
+  onSubmit(): void {
+    if (this.registerForm.invalid) {
+      this.errorMessage = 'Please fill all required fields correctly.';
+      return;
+    }
+
+    this.authService.register(this.registerForm.value).subscribe({
+      next: (res) => {
+        console.log('Registration successful:', res);
+        alert('Registration successful! Please login.');
+      },
+      error: (err) => {
+        console.error('Registration failed:', err);
+        this.errorMessage = err.error?.message || 'Registration failed. Please try again.';
+      }
+    });
   }
 }

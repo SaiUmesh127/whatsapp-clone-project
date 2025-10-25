@@ -1,25 +1,29 @@
 <div class="login-container">
-  <div class="login-box">
-    <div class="logo">
-      <svg viewBox="0 0 24 24" width="60" height="60">
-        <!-- SVG Path Here -->
-      </svg>
-      <h1>WhatsApp Clone</h1>
+  <h2>Login</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Username *</label>
+      <input type="text" formControlName="username" placeholder="Enter username" />
+      <small *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+        Username is required
+      </small>
     </div>
 
-    <form (ngSubmit)="onSubmit()" class="login-form">
-      <h2>Sign in to continue</h2>
+    <div class="form-group">
+      <label>Password *</label>
+      <input type="password" formControlName="password" placeholder="Enter password" />
+      <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        Password is required
+      </small>
+    </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        <span>⚠️ {{ errorMessage }}</span>
-      </div>
+    <button type="submit" [disabled]="loginForm.invalid">Login</button>
 
-      <input type="text" [(ngModel)]="loginData.username" name="username" placeholder="Username" required [disabled]="loading">
-      <input type="password" [(ngModel)]="loginData.password" name="password" placeholder="Password" required [disabled]="loading">
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
 
-      <button type="submit" [disabled]="loading">{{ loading ? 'Signing in...' : 'Sign In' }}</button>
-
-      <p>Don't have an account? <a (click)="goToRegister()">Register here</a></p>
-    </form>
-  </div>
+    <p class="redirect">
+      Don’t have an account? <a routerLink="/register">Register here</a>
+    </p>
+  </form>
 </div>

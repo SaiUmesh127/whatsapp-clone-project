@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+// import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -15,12 +15,14 @@ import { ChatWindowComponent } from './components/chat-window/chat-window.compon
 
 // Import interceptor
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
     RegisterComponent,
+    LoginComponent,
     ChatComponent,
     SidebarComponent,
     ChatWindowComponent
@@ -28,8 +30,9 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    HttpClientModule,
     FormsModule,
-    HttpClientModule
+    ReactiveFormsModule 
   ],
   providers: [
     {
